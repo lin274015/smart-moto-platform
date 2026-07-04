@@ -1,0 +1,16 @@
+{
+  "name": "smart-moto-ai-platform",
+  "version": "1.0.0",
+  "description": "智慧機車維修管理平台 full-stack prototype",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.2"
+  }
+}

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>智慧機車維修管理平台</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">M</div>
+          <div>
+            <strong>MotoAI</strong>
+            <span>維修管理</span>
+          </div>
+        </div>
+
+        <nav class="nav-tabs" aria-label="主要頁籤">
+          <button class="nav-tab active" data-view="dashboard" type="button">總覽</button>
+          <button class="nav-tab" data-view="records" type="button">維修紀錄</button>
+          <button class="nav-tab" data-view="quote" type="button">估價單</button>
+          <button class="nav-tab" data-view="assistant" type="button">AI 助手</button>
+          <button class="nav-tab" data-view="training" type="button">助手訓練</button>
+        </nav>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">生成式 AI 期末專案</p>
+            <h1>智慧機車維修管理平台</h1>
+          </div>
+          <div class="status-pill">
+            <span class="dot"></span>
+            本機 API
+          </div>
+        </header>
+
+        <section id="dashboard" class="view active">
+          <div class="summary-grid">
+            <article class="metric-panel">
+              <span>維修紀錄</span>
+              <strong id="recordCount">0</strong>
+              <small>已匯入來源資料</small>
+            </article>
+            <article class="metric-panel">
+              <span>估價合計</span>
+              <strong id="quoteTotal">$0</strong>
+              <small>材料 + 其他費用</small>
+            </article>
+            <article class="metric-panel">
+              <span>AI 知識庫</span>
+              <strong>6+</strong>
+              <small>計畫書、表單與公式</small>
+            </article>
+          </div>
+
+          <div class="dashboard-layout">
+            <section class="panel">
+              <div class="panel-header">
+                <h2>今日工作流</h2>
+              </div>
+              <div class="workflow">
+                <div>
+                  <span>1</span>
+                  <strong>建立維修單</strong>
+                  <p>輸入車牌、公里數、檢查項目與維修項目。</p>
+                </div>
+                <div>
+                  <span>2</span>
+                  <strong>AI 產生紀錄</strong>
+                  <p>把技師短句整理成客戶可讀的維修摘要。</p>
+                </div>
+                <div>
+                  <span>3</span>
+                  <strong>估價與追蹤</strong>
+                  <p>依 Excel 公式計算材料、工資與毛利。</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel visual-panel">
+              <div class="gauge">
+                <div class="gauge-core">
+                  <span id="latestMileage">0</span>
+                  <small>km</small>
+                </div>
+              </div>
+              <h2>來源樣本</h2>
+              <p id="latestSample">尚未載入資料</p>
+            </section>
+          </div>
+        </section>
+
+        <section id="records" class="view">
+          <div class="two-column">
+            <section class="panel">
+              <div class="panel-header">
+                <h2>車牌查詢</h2>
+              </div>
+              <form id="recordSearchForm" class="search-form">
+                <input name="plate" placeholder="輸入車牌，例如 PDF-3376" autocomplete="off" />
+                <button class="primary-button" type="submit">查詢</button>
+                <button id="clearRecordSearch" class="secondary-button" type="button">清除</button>
+              </form>
+              <p id="recordSearchSummary" class="muted">顯示最近維修紀錄。</p>
+              <div id="recordList" class="record-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>維修明細</h2>
+              </div>
+              <div id="recordDetail" class="record-detail"></div>
+            </section>
+          </div>
+
+          <form id="recordForm" class="panel form-panel record-create-panel">
+            <div class="panel-header">
+              <h2>新增維修紀錄</h2>
+            </div>
+            <div class="form-grid">
+              <label>車牌 <input name="plate" value="PDQ-3559" /></label>
+              <label>車主 <input name="owner" value="EDA-台南" /></label>
+              <label>廠牌型式 <input name="model" placeholder="例：YAMAHA / SYM" /></label>
+              <label>公里數 <input name="mileage" type="number" value="3413" /></label>
+            </div>
+            <label>維修項目 <textarea name="repairItems" rows="3">O+G FULLBORE-K+150</textarea></label>
+            <label>建議更換項目 / 備註 <textarea name="recommendations" rows="3" placeholder="例如：下次回廠檢查傳動組與煞車油"></textarea></label>
+            <button class="primary-button" type="submit">儲存紀錄</button>
+          </form>
+        </section>
+
+        <section id="quote" class="view">
+          <div class="two-column">
+            <form id="quoteForm" class="panel form-panel">
+              <div class="panel-header">
+                <h2>估價計算</h2>
+              </div>
+              <div class="form-grid">
+                <label>料號 <input name="partNo" value="F01" /></label>
+                <label>材料名稱 <input name="name" value="頭燈總成" /></label>
+                <label>數量 <input name="quantity" type="number" value="1" /></label>
+                <label>牌價 <input name="listPrice" type="number" value="1650" /></label>
+              </div>
+              <div class="form-grid">
+                <label>維修工時 <input name="laborHours" type="number" step="0.5" value="1" /></label>
+                <label>每小時工資 <input name="laborRate" type="number" value="650" /></label>
+                <label>檢查費 <input name="inspectionFee" type="number" value="0" /></label>
+                <label>其他費用 <input name="otherFee" type="number" value="0" /></label>
+              </div>
+              <label>損壞狀況 <textarea name="damage" rows="3">頭燈檢查</textarea></label>
+              <button class="primary-button" type="submit">計算維修事件金額</button>
+            </form>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>計算結果</h2>
+              </div>
+              <div id="quoteResult" class="quote-result"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="assistant" class="view">
+          <div class="chat-layout">
+            <section class="panel chat-panel">
+              <div class="panel-header">
+                <h2>MotoAI 維修助手</h2>
+              </div>
+              <div id="chatMessages" class="chat-messages"></div>
+              <form id="chatForm" class="chat-form">
+                <input name="message" placeholder="問：這台車要怎麼產生保養建議？" autocomplete="off" />
+                <button class="primary-button" type="submit">送出</button>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>快速指令</h2>
+              </div>
+              <div class="quick-prompts">
+                <button type="button" data-prompt="請幫我說明 PDQ-3559 的保養建議">保養建議</button>
+                <button type="button" data-prompt="估價單的毛利公式是什麼？">估價公式</button>
+                <button type="button" data-prompt="目前 AI 助手是怎麼訓練的？">訓練方式</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="ai-tool-grid">
+            <form id="reportForm" class="panel ai-tool-panel">
+              <div class="panel-header">
+                <h2>AI 維修報告生成</h2>
+              </div>
+              <div class="form-grid">
+                <label>車型 <input name="vehicle" value="SYM JET SL" /></label>
+                <label>車牌 <input name="plate" value="PDF-3376" /></label>
+                <label>里程 <input name="mileage" type="number" value="33332" /></label>
+                <label>更換零件 <input name="parts" value="煞車皮" /></label>
+              </div>
+              <label>故障描述 <textarea name="problem" rows="4">煞車異音，低速煞車時聲音明顯。</textarea></label>
+              <button class="primary-button" type="submit">AI 生成維修報告</button>
+              <pre id="reportOutput"></pre>
+              <button class="secondary-button result-open" data-output="reportOutput" data-title="AI 維修報告" type="button" hidden>查看完整報告</button>
+            </form>
+
+            <form id="diagnosisForm" class="panel ai-tool-panel">
+              <div class="panel-header">
+                <h2>AI 故障診斷</h2>
+              </div>
+              <div class="form-grid">
+                <label>車型 <input name="plate" value="PDF-3376" /></label>
+                <label>車牌 <input name="vehicle" value="SYM JET SL" /></label>
+                <label>里程 <input name="mileage" type="number" value="33332" /></label>
+              </div>
+              <label>症狀 <textarea name="symptom" rows="4">冷車難發動，發動後怠速不穩。</textarea></label>
+              <button class="primary-button" type="submit">AI 分析故障</button>
+              <pre id="diagnosisOutput"></pre>
+              <button class="secondary-button result-open" data-output="diagnosisOutput" data-title="AI 故障診斷" type="button" hidden>查看完整分析</button>
+            </form>
+
+            <form id="maintenanceForm" class="panel ai-tool-panel">
+              <div class="panel-header">
+                <h2>AI 保養建議</h2>
+              </div>
+              <div class="form-grid">
+                <label>車型 <input name="plate" value="PDF-3376" /></label>
+                <label>車牌 <input name="model" value="MANY-白" /></label>
+                <label>里程 <input name="mileage" type="number" value="33332" /></label>
+              </div>
+              <label>補充描述 <textarea name="description" rows="3">客戶想確認下次回廠前需要注意哪些項目。</textarea></label>
+              <button class="primary-button" type="submit">AI 產生保養建議</button>
+              <pre id="maintenanceOutput"></pre>
+              <button class="secondary-button result-open" data-output="maintenanceOutput" data-title="AI 保養建議" type="button" hidden>查看完整建議</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="training" class="view">
+          <div class="two-column">
+            <form id="trainingForm" class="panel form-panel">
+              <div class="panel-header">
+                <h2>新增訓練樣本</h2>
+              </div>
+              <label>意圖 <input name="intent" value="維修說明標準化" /></label>
+              <label>使用者輸入 <textarea name="input" rows="4">客人問 O+G FULLBORE-K+150 是什麼？</textarea></label>
+              <label>理想回答 <textarea name="output" rows="5">這筆紀錄代表本次維修/保養項目含 O+G FULLBORE-K+150，建議技師補充實際更換品項、數量與檢查結果，讓客戶能清楚了解處理內容。</textarea></label>
+              <button class="primary-button" type="submit">加入知識庫</button>
+            </form>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>訓練資料輸出</h2>
+              </div>
+              <p class="muted">可匯出 JSONL，後續接到真正 LLM fine-tuning 或評測流程。</p>
+              <button id="exportTraining" class="secondary-button" type="button">下載 JSONL</button>
+              <pre id="trainingStatus"></pre>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="resultModal" class="modal" hidden>
+      <div class="modal-backdrop" data-close-modal></div>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="resultModalTitle">
+        <div class="modal-header">
+          <h2 id="resultModalTitle">完整內容</h2>
+          <button class="secondary-button" data-close-modal type="button">關閉</button>
+        </div>
+        <pre id="resultModalBody"></pre>
+      </section>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
